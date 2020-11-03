@@ -1,5 +1,6 @@
 import unittest
 from main import get_parser, check_argument_parsing
+from vectorization import load_dataset, vectorizes_label, vectorizes_features
 
 
 class TestArgumentParser(unittest.TestCase):
@@ -51,6 +52,22 @@ class TestArgumentParser(unittest.TestCase):
                 check_argument_parsing(
                     self.parser.parse_args(nok_args)
                 )
+
+
+class TestVectorization(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.df = load_dataset("fixtures/fixtures_dataset.csv")
+
+    def test_morgan_fingerpriting(self):
+        y = vectorizes_label(self.df)
+        self.assertEqual(y.shape, (49, 1))
+
+        x1 = vectorizes_features(self.df, **{"size": 2048})
+        self.assertEqual(x1.shape, (49, 2048))
+
+        x2 = vectorizes_features(self.df, **{"size": 1024})
+        self.assertEqual(x2.shape, (49, 1024))
 
 
 if __name__ == "__main__":
