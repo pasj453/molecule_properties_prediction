@@ -88,7 +88,7 @@ if __name__ == "__main__":
         with open(os.path.join(args.output_dir, "resultats.json"), "w") as f:
             json.dump(res, f)
 
-    if checked_args.task == "predict":
+    elif checked_args.task == "predict":
         if args.model_type == "dummy":
             with open(args.model, "rb") as f:
                 clf = pickle.load(f)
@@ -97,3 +97,13 @@ if __name__ == "__main__":
             print("mol: {}, {}".format(args.smile, clf.predict(x)))
         except Exception() as e:
             print(e)
+
+    elif checked_args.task == "evaluate":
+        if args.model_type == "dummy":
+            with open(args.model, "rb") as f:
+                clf = pickle.load(f)
+            df = load_dataset(args.fname)
+            x_test = vectorizes_features(df)
+            y_test = vectorizes_label(df)
+            score = clf.score(x_test, y_test)
+            print(score)
