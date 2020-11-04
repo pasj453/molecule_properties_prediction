@@ -1,5 +1,5 @@
 from flask import Flask
-from vectorization import vectorizes_smile
+from .vectorization import vectorizes_smile
 
 
 def get_app(model):

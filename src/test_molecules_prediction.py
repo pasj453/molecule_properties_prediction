@@ -1,9 +1,10 @@
 import unittest
 import pickle
 
-from main import get_parser, check_argument_parsing
-from vectorization import load_dataset, vectorizes_label, vectorizes_features
-from utils import get_app
+from .main import get_parser, check_argument_parsing
+from .vectorization import (load_dataset, vectorizes_label,
+                            vectorizes_features)
+from .utils import get_app
 
 
 class TestArgumentParser(unittest.TestCase):

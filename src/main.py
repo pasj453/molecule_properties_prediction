@@ -7,10 +7,10 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.dummy import DummyClassifier
 
-from vectorization import (load_dataset, vectorizes_features, vectorizes_label,
-                           vectorizes_smile)
+from .vectorization import (load_dataset, vectorizes_features,
+                            vectorizes_label, vectorizes_smile)
 
-from utils import get_app
+from .utils import get_app
 
 
 def check_argument_parsing(args: argparse.Namespace) -> argparse.Namespace:
@@ -54,7 +54,7 @@ def get_parser() -> argparse.ArgumentParser():
     return parser
 
 
-if __name__ == "__main__":
+def main():
     parser = get_parser()
     args = parser.parse_args()
     checked_args = check_argument_parsing(args)
@@ -111,3 +111,7 @@ if __name__ == "__main__":
     else:
         app = get_app(clf)
         app.run()
+
+
+if __name__ == "__main__":
+    main()
