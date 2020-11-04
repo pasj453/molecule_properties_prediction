@@ -7,7 +7,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.dummy import DummyClassifier
 
-from vectorization import load_dataset, vectorizes_features, vectorizes_label
+from vectorization import (load_dataset, vectorizes_features, vectorizes_label,
+                           vectorizes_smile)
 
 
 def check_argument_parsing(args: argparse.Namespace) -> argparse.Namespace:
@@ -66,10 +67,10 @@ if __name__ == "__main__":
             random_state=args.random_state
         )
 
-        if not os.path.isdir(args.outputs):
-            os.mkdir(args.outputs)
-        for arr in (x_train, x_test, y_train, y_test):
-            np.save(os.path.join(args.outputs, arr.__name__), arr)
+        if not os.path.isdir(args.output_dir):
+            os.mkdir(args.output_dir)
+        for arr, arr_name in ((x_test, "x_test.npy"), (y_test, "y_test.npy")):
+            np.save(os.path.join(args.output_dir, arr_name), arr)
 
         if args.model_type == "dummy":
             clf = DummyClassifier(strategy="most_frequent")
@@ -84,5 +85,15 @@ if __name__ == "__main__":
             "random_state": args.random_state,
             "score": score
         }
-        with open(os.path.join(args.outputs, "resultats.json"), "w") as f:
+        with open(os.path.join(args.output_dir, "resultats.json"), "w") as f:
             json.dump(res, f)
+
+    if checked_args.task == "predict":
+        if args.model_type == "dummy":
+            with open(args.model, "rb") as f:
+                clf = pickle.load(f)
+        try:
+            x = vectorizes_smile(checked_args.smile).reshape((1, -1))
+            print("mol: {}, {}".format(args.smile, clf.predict(x)))
+        except Exception() as e:
+            print(e)

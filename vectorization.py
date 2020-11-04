@@ -16,6 +16,10 @@ def fingerprint_features(smile_string, radius=2, size=2048):
                                                           )
 
 
+def vectorizes_smile(smile: str) -> np.ndarray:
+    return np.array(fingerprint_features(smile))
+
+
 def load_dataset(fname: str) -> pd.DataFrame:
     return pd.read_csv(fname)
 
