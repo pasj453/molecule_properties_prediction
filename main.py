@@ -10,6 +10,8 @@ from sklearn.dummy import DummyClassifier
 from vectorization import (load_dataset, vectorizes_features, vectorizes_label,
                            vectorizes_smile)
 
+from utils import get_app
+
 
 def check_argument_parsing(args: argparse.Namespace) -> argparse.Namespace:
     if args.task == "train" or args.task == "evaluate":
@@ -88,22 +90,24 @@ if __name__ == "__main__":
         with open(os.path.join(args.output_dir, "resultats.json"), "w") as f:
             json.dump(res, f)
 
-    elif checked_args.task == "predict":
-        if args.model_type == "dummy":
-            with open(args.model, "rb") as f:
-                clf = pickle.load(f)
+    if args.model_type == "dummy":
+        with open(args.model, "rb") as f:
+            clf = pickle.load(f)
+    if checked_args.task == "predict":
         try:
-            x = vectorizes_smile(checked_args.smile).reshape((1, -1))
+            x = vectorizes_smile(checked_args.smile)
             print("mol: {}, {}".format(args.smile, clf.predict(x)))
         except Exception() as e:
             print(e)
 
     elif checked_args.task == "evaluate":
-        if args.model_type == "dummy":
-            with open(args.model, "rb") as f:
-                clf = pickle.load(f)
-            df = load_dataset(args.fname)
-            x_test = vectorizes_features(df)
-            y_test = vectorizes_label(df)
-            score = clf.score(x_test, y_test)
-            print(score)
+        df = load_dataset(args.fname)
+        x_test = vectorizes_features(df)
+        y_test = vectorizes_label(df)
+        score = clf.score(x_test, y_test)
+        print(score)
+
+    # API
+    else:
+        app = get_app(clf)
+        app.run()

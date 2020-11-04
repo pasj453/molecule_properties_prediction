@@ -1,6 +1,9 @@
 import unittest
+import pickle
+
 from main import get_parser, check_argument_parsing
 from vectorization import load_dataset, vectorizes_label, vectorizes_features
+from utils import get_app
 
 
 class TestArgumentParser(unittest.TestCase):
@@ -68,6 +71,20 @@ class TestVectorization(unittest.TestCase):
 
         x2 = vectorizes_features(self.df, **{"size": 1024})
         self.assertEqual(x2.shape, (49, 1024))
+
+
+class TestAPI(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        with open("fixtures/test_model.h5", "rb") as f:
+            clf = pickle.load(f)
+        cls.app = get_app(clf).test_client()
+
+    def test_predict(self):
+        res = self.app.get(
+            "/predict/COc1ccc(C2C(C(=O)NCc3ccccc3)=C(C)N=C3N=CNN32)cc1OC"
+        )
+        self.assertEqual(200, res.status_code)
 
 
 if __name__ == "__main__":
