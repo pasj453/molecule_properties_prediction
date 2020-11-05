@@ -8,6 +8,10 @@ def get_mlp(exit_dim: int,
     clf = tf.keras.Sequential()
     clf.add(tf.keras.layers.Dense(neurons, activation))
     clf.add(tf.keras.layers.Dropout(dropout_rate))
+    clf.add(tf.keras.layers.Dense(neurons, activation))
+    clf.add(tf.keras.layers.Dropout(dropout_rate))
+    clf.add(tf.keras.layers.Dense(neurons, activation))
+    clf.add(tf.keras.layers.Dropout(dropout_rate))
     clf.add(tf.keras.layers.Dense(exit_dim, activation="sigmoid"))
 
     return clf
