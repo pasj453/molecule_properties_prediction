@@ -1,10 +1,12 @@
 import unittest
 import pickle
 
-from .main import get_parser, check_argument_parsing
-from .vectorization import (load_dataset, vectorizes_label,
-                            vectorizes_features)
-from .utils import get_app
+from gensim.models import word2vec
+
+from src.main import get_parser, check_argument_parsing
+from src.vectorization import (load_dataset, vectorizes_label,
+                               vectorizes_features, vec_mol2vec_smile)
+from src.utils import get_app
 
 
 class TestArgumentParser(unittest.TestCase):
@@ -72,6 +74,11 @@ class TestVectorization(unittest.TestCase):
 
         x2 = vectorizes_features(self.df, **{"size": 1024})
         self.assertEqual(x2.shape, (49, 1024))
+
+    def test_mol2vec(self):
+        model = word2vec.Word2Vec.load('models/model_300dim.pkl')
+        smiles = self.df["smiles"].tolist()
+        vec_mol2vec_smile(smiles, model)
 
 
 class TestAPI(unittest.TestCase):

@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-def get_mlp(input_dim: int, exit_dim: int,
+def get_mlp(exit_dim: int,
             neurons: int,
             dropout_rate: float,
             activation) -> tf.keras.Sequential:
@@ -10,6 +10,17 @@ def get_mlp(input_dim: int, exit_dim: int,
     clf.add(tf.keras.layers.Dropout(dropout_rate))
     clf.add(tf.keras.layers.Dense(exit_dim, activation="sigmoid"))
 
+    return clf
+
+
+def get_rnn(exit_dim: int,
+            neurons: int, dropout_rate: float):
+    clf = tf.keras.Sequential()
+    clf.add(tf.keras.layers.GRU(neurons, return_sequences=True))
+    clf.add(tf.keras.layers.Dropout(dropout_rate))
+    clf.add(tf.keras.layers.GRU(neurons))
+    clf.add(tf.keras.layers.Dropout(dropout_rate))
+    clf.add(tf.keras.layers.Dense(exit_dim, activation="sigmoid"))
     return clf
 
 
