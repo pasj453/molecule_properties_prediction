@@ -1,0 +1,1 @@
+{"neurons": 512, "dropout_rate": 0.2, "activation": "sigmoid", "opt": "adam", "epochs": 100, "batch_size": 32, "learning_rate": 0.000001}

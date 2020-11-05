@@ -74,6 +74,8 @@ def main():
 
     if checked_args.task == "train":
         df = load_dataset(args.fname)
+
+        # vectorization
         if not (args.model_type == "rnn"):
             x, y = vectorizes_features(df), vectorizes_label(df, multi)
         else:
@@ -81,9 +83,10 @@ def main():
             y = vectorizes_label(df, multi)
             x = vec_mol2vec_smile(df["smiles"].tolist(), mol2vec)
 
+        # train-test-split
         x_train, x_test, y_train, y_test = train_test_split(
             x, y,
-            stratify=y if args.objective == "single-metrics" else None,
+            stratify=y if not multi else None,
             train_size=0.9,
             random_state=args.random_state
         )

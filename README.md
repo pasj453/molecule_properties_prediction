@@ -52,8 +52,8 @@ for each model. Currently the hyperparameters are:
 ## Results Accuracy
 
 DUMMY: 75%
-MLP: 80%
-RNN: 30%
+MLP: 82%
+RNN: 41%
 
 The results of the RNN are disppointing, I expect the OOV problem to be 
 implicated. Rebuilding a mol2vec might solve the problem. Also, a RNN
