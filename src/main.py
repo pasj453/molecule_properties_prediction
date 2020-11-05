@@ -4,6 +4,7 @@ import pickle
 import argparse
 
 import numpy as np
+import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.dummy import DummyClassifier
 
@@ -11,6 +12,8 @@ from .vectorization import (load_dataset, vectorizes_features,
                             vectorizes_label, vectorizes_smile)
 
 from .utils import get_app
+
+from .models import get_mlp, get_callbacks
 
 
 def check_argument_parsing(args: argparse.Namespace) -> argparse.Namespace:
@@ -45,7 +48,10 @@ def get_parser() -> argparse.ArgumentParser():
     parser.add_argument("--fname", help="filepath for dataset")
     parser.add_argument("--model", help="filepath for model loading or saving",
                         default="models/model.h5")
-    parser.add_argument("--model-type", choices=["dummy"], default="dummy")
+    parser.add_argument("--model-type", choices=["dummy", "mlp"],
+                        default="dummy")
+    parser.add_argument("--hyperparameters", default="hp.json",
+                        help="filepath for model hyperparameters")
     parser.add_argument("--output-dir", default="outputs")
     parser.add_argument("--smile")
     parser.add_argument("--random-state", type=int,
@@ -71,6 +77,7 @@ def main():
 
         if not os.path.isdir(args.output_dir):
             os.mkdir(args.output_dir)
+        # useful for restesting on same array
         for arr, arr_name in ((x_test, "x_test.npy"), (y_test, "y_test.npy")):
             np.save(os.path.join(args.output_dir, arr_name), arr)
 
@@ -82,17 +89,33 @@ def main():
             with open(args.model, "wb") as f:
                 pickle.dump(clf, f)
 
-        res = {
+        elif args.model_type == "mlp":
+            with open(args.hyperparameters) as f:
+                hp = json.load(f)
+            clf = get_mlp(2048, 1 if args.objective == "single-metrics" else 9,
+                          hp["neurons"], hp["dropout_rate"],
+                          hp["activation"])
+            clf.compile(optimizer=hp["opt"], loss="categorical_crossentropy",
+                        metrics=['accuracy'])
+            clf.fit(x_train, y_train, batch_size=hp["batch_size"],
+                    epochs=hp["epochs"], validation_data=(x_test, y_test),
+                    callbacks=get_callbacks(args.model))
+            score = clf.evaluate(x_test, y_test,
+                                 batch_size=hp["batch_size"])[1]
+
+        results = {
             "model-type": args.model_type,
             "random_state": args.random_state,
-            "score": score
+            "score": float(score)
         }
         with open(os.path.join(args.output_dir, "resultats.json"), "w") as f:
-            json.dump(res, f)
+            json.dump(results, f)
 
     if args.model_type == "dummy":
         with open(args.model, "rb") as f:
             clf = pickle.load(f)
+    elif args.model_type == "mlp":
+        clf = tf.keras.Model.load_model(args.model)
     if checked_args.task == "predict":
         try:
             x = vectorizes_smile(checked_args.smile)
@@ -100,7 +123,7 @@ def main():
         except Exception() as e:
             print(e)
 
-    elif checked_args.task == "evaluate":
+    if checked_args.task == "evaluate":
         df = load_dataset(args.fname)
         x_test = vectorizes_features(df)
         y_test = vectorizes_label(df)
@@ -108,7 +131,7 @@ def main():
         print(score)
 
     # API
-    else:
+    elif checked_args.task == "server-start":
         app = get_app(clf)
         app.run()
 
