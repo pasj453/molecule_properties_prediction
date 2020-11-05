@@ -107,8 +107,13 @@ def main():
             clf = get_mlp(1 if args.objective == "single-metrics" else 9,
                           hp["neurons"], hp["dropout_rate"],
                           hp["activation"])
-            clf.compile(optimizer=hp["opt"], loss="categorical_crossentropy",
-                        metrics=['accuracy'])
+            clf.compile(
+                optimizer=tf.keras.optimizers.Adam(
+                    learning_rate=hp["learning_rate"]
+                ),
+                loss="categorical_crossentropy",
+                metrics=['accuracy']
+            )
             clf.fit(x_train, y_train, batch_size=hp["batch_size"],
                     epochs=hp["epochs"], validation_data=(x_test, y_test),
                     callbacks=get_callbacks(args.model))
@@ -120,8 +125,13 @@ def main():
                 hp = json.load(f)
             clf = get_rnn(1 if args.objective == "single-metrics" else 9,
                           hp["neurons"], hp["dropout_rate"])
-            clf.compile(optimizer=hp["opt"], loss="categorical_crossentropy",
-                        metrics=['accuracy'])
+            clf.compile(
+                optimizer=tf.keras.optimizers.Adam(
+                    learning_rate=hp["learning_rate"]
+                ),
+                loss="categorical_crossentropy",
+                metrics=['accuracy']
+            )
             clf.fit(x_train, y_train, batch_size=hp["batch_size"],
                     epochs=hp["epochs"], validation_data=(x_test, y_test),
                     callbacks=get_callbacks(args.model))
