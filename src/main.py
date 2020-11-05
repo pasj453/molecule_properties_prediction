@@ -69,20 +69,21 @@ def main():
     args = parser.parse_args()
     checked_args = check_argument_parsing(args)
 
+    multi = True if args.objective == "multi-metrics" else False
+
     if checked_args.task == "train":
         df = load_dataset(args.fname)
         if not (args.model_type == "rnn"):
-            x, y = vectorizes_features(df), vectorizes_label(df)
+            x, y = vectorizes_features(df), vectorizes_label(df, multi)
         else:
             mol2vec = word2vec.Word2Vec.load('models/model_300dim.pkl')
-            y = vectorizes_label(df)
+            y = vectorizes_label(df, multi)
             x = vec_mol2vec_smile(df["smiles"].tolist(), mol2vec)
-            print(x.dtype)
-            print(x.shape)
 
         x_train, x_test, y_train, y_test = train_test_split(
             x, y,
-            test_size=0.9,
+            stratify=y if args.objective == "single-metrics" else None,
+            train_size=0.9,
             random_state=args.random_state
         )
 
@@ -103,7 +104,7 @@ def main():
         elif args.model_type == "mlp":
             with open(args.hyperparameters) as f:
                 hp = json.load(f)
-            clf = get_mlp(2048, 1 if args.objective == "single-metrics" else 9,
+            clf = get_mlp(1 if args.objective == "single-metrics" else 9,
                           hp["neurons"], hp["dropout_rate"],
                           hp["activation"])
             clf.compile(optimizer=hp["opt"], loss="categorical_crossentropy",
@@ -161,7 +162,7 @@ def main():
                 x_test = vec_mol2vec_smile(df["smiles"].tolist())
             else:
                 x_test = vectorizes_features(df)
-            y_test = vectorizes_label(df)
+            y_test = vectorizes_label(df, multi)
             score = clf.score(x_test, y_test)
             print(score)
 

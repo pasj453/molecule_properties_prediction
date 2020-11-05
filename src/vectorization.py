@@ -49,8 +49,12 @@ def load_dataset(fname: str) -> pd.DataFrame:
     return pd.read_csv(fname)
 
 
-def vectorizes_label(df: pd.DataFrame) -> np.ndarray:
-    return df["P1"].values.reshape((-1, 1))
+def vectorizes_label(df: pd.DataFrame, multi: bool = False) -> np.ndarray:
+    if multi:
+        return df[["P1", "P2", "P3", "P4", "P5",
+                   "P6", "P7", "P8", "P9"]].values
+    else:
+        return df["P1"].values.reshape((-1, 1))
 
 
 def vectorizes_features(df: pd.DataFrame, **fingerprint_args) -> np.ndarray:
