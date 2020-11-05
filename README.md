@@ -2,12 +2,12 @@
 
 This repository contains code for molecule proterty prediction,
 based on neural-based inferences. There are two types of model:
-* a multilayer perceptron with on intermediate layer
+* a multilayer perceptron with several intermediate layers
 * a GRU-based RNN model
 
 The RNN is learned with a model of [mol2vec](https://mol2vec.readthedocs.io/en/latest/)
  inspired by the famous [word2vec](https://fr.wikipedia.org/wiki/Word2vec) model.
-Both model are written in tensorflow
+Both model are written in tensorflow.
 
 ## Installation
 
@@ -41,7 +41,7 @@ docker run -it -v $(pwd)/data:/app/data -v $(pwd)/models:/app/models -p 127.0.0.
 ## Training
 
 To train the model, a json file must be provided with the relevant hyperparameters
-for each model. Currently the hyperparamets are:
+for each model. Currently the hyperparameters are:
 * the number of units per layer `neurons`
 * dropout rate `dropout_rate`
 * the default activation for each layer of mlp `activation`
@@ -55,21 +55,25 @@ DUMMY: 75%
 MLP: 80%
 RNN: 30%
 
+The results of the RNN are disppointing, I expect the OOV problem to be 
+implicated. Rebuilding a mol2vec might solve the problem. Also, a RNN
+may not be ideal in this type of setting, maybe several 1D-convolutions
+could provide a better solution.
+
 ## Next steps
 
-The hyperparameter tuning was done by hand, one should continue do it more
+The hyperparameter tuning was done by hand, one should continue and do it more
 rigorously with either a random search or with bayesian optimization,
-the implementation could be done with the `hyperopt` packages.
+the implementation could be done with the `hyperopt` package.
 
-The mol2vec model used was pretrained on the ZINC databases, I did
-encounter some Out of Vocabulary problem, so retraining a mol2vec on
-a database closer to our dataset could provide better results. There is a
-problem of Out of Vocabulary, whcih probably has a big impact.
+The mol2vec model used was pretrained on the ZINC database, I did
+encounter some Out of Vocabulary problems, so retraining a mol2vec on
+a database closer to the provided dataset could yield better results.
 
 We are working on sequences representing molecules, but as there may exist some
-cycle in the molecules, it may not be the method. Graph neural network, and 
+cycles in a molecule, it may not be adequate. Graph neural networks, and 
 espcially the use of the transformer's architecture could provide
 good results.
 
 As for the multiobjective tasks, I would like to read this
-[paper](MONN: A Multi-objective Neural Network for Predicting Compound-Protein Interactions and Affinities) in more details.
+[paper](https://www.sciencedirect.com/science/article/pii/S2405471220300818) in more details.
