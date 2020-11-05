@@ -19,6 +19,7 @@ from .models import get_mlp, get_callbacks, get_rnn
 
 
 def check_argument_parsing(args: argparse.Namespace) -> argparse.Namespace:
+    """ parse command line arguments """
     if args.task == "train" or args.task == "evaluate":
         if not args.fname or not os.path.isfile(args.fname):
             raise FileNotFoundError(

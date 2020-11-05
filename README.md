@@ -49,4 +49,27 @@ for each model. Currently the hyperparamets are:
 * the number of epochs `epochs`
 * the size for each batch `batch_size`
 
-## Results
+## Results Accuracy
+
+DUMMY: 75%
+MLP: 80%
+RNN: 30%
+
+## Next steps
+
+The hyperparameter tuning was done by hand, one should continue do it more
+rigorously with either a random search or with bayesian optimization,
+the implementation could be done with the `hyperopt` packages.
+
+The mol2vec model used was pretrained on the ZINC databases, I did
+encounter some Out of Vocabulary problem, so retraining a mol2vec on
+a database closer to our dataset could provide better results. There is a
+problem of Out of Vocabulary, whcih probably has a big impact.
+
+We are working on sequences representing molecules, but as there may exist some
+cycle in the molecules, it may not be the method. Graph neural network, and 
+espcially the use of the transformer's architecture could provide
+good results.
+
+As for the multiobjective tasks, I would like to read this
+[paper](MONN: A Multi-objective Neural Network for Predicting Compound-Protein Interactions and Affinities) in more details.
